@@ -87,3 +87,77 @@ $app->get('/api/products/related/{id}', function(Request $request, Response $res
         echo '{"error": {"text": '.$e->getMessage().'}';
     }
 });
+
+$app->get('/api/category/products/{id}', function(Request $request, Response $response){
+    $categoryId = $request->getAttribute('id');
+    $sql = "SELECT * FROM  product WHERE category= :categoryId AND status = 1";
+
+    try{
+        // Get DB Object
+        $db = new db();
+        // Connect
+        $db = $db->connect();
+
+        $stmt = $db->prepare($sql);
+			$stmt->bindParam(":categoryId", $categoryId);
+			$stmt->execute();
+        $related = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        //echo json_encode($customers);
+        return $response->withJson([
+            'message' => "successfully Fetched",
+            'featured' => $related
+             ]);
+    } catch(PDOException $e){
+        echo '{"error": {"text": '.$e->getMessage().'}';
+    }
+});
+
+$app->get('/api/category', function(Request $request, Response $response){
+    $sql = "SELECT 	id, category FROM  category WHERE status = 1";
+
+    try{
+        // Get DB Object
+        $db = new db();
+        // Connect
+        $db = $db->connect();
+
+        $stmt = $db->query($sql);
+        $category = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        //echo json_encode($customers);
+        return $response->withJson([
+            'message' => "successfully Fetched",
+            'featured' => $category
+             ]);
+    } catch(PDOException $e){
+        echo '{"error": {"text": '.$e->getMessage().'}';
+    }
+});
+
+
+$app->get('/api/category/sub/{id}', function(Request $request, Response $response){
+    $categoryId = $request->getAttribute('id');
+
+    $sql = "SELECT id, category, subcategory FROM subcategory WHERE category = :categoryId";
+
+    try{
+        // Get DB Object
+        $db = new db();
+        // Connect
+        $db = $db->connect();
+
+        $stmt = $db->prepare($sql);
+        $stmt->bindParam(":categoryId", $categoryId);
+			$stmt->execute();
+        $subCategory = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        //echo json_encode($customers);
+        return $response->withJson([
+            'message' => "successfully Fetched",
+            'featured' => $subCategory
+             ]);
+    } catch(PDOException $e){
+        echo '{"error": {"text": '.$e->getMessage().'}';
+    }
+});
