@@ -61,3 +61,29 @@ $app->get('/api/products/featured', function(Request $request, Response $respons
         echo '{"error": {"text": '.$e->getMessage().'}';
     }
 });
+
+
+$app->get('/api/products/related/{id}', function(Request $request, Response $response){
+    $categoryId = $request->getAttribute('id');
+    $sql = "SELECT id, title, price, stock, measurement, measurement_value, cover_img FROM  product WHERE category= :categoryId AND status = 1  ORDER BY RAND() LIMIT 5";
+
+    try{
+        // Get DB Object
+        $db = new db();
+        // Connect
+        $db = $db->connect();
+
+        $stmt = $db->prepare($sql);
+			$stmt->bindParam(":categoryId", $categoryId);
+			$stmt->execute();
+        $related = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        //echo json_encode($customers);
+        return $response->withJson([
+            'message' => "successfully Fetched",
+            'featured' => $related
+             ]);
+    } catch(PDOException $e){
+        echo '{"error": {"text": '.$e->getMessage().'}';
+    }
+});
