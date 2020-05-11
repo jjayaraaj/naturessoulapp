@@ -17,6 +17,29 @@ $app->add(function ($req, $res, $next) {
 });
 
 
+$app->get('/api/products/top', function(Request $request, Response $response){
+    $sql = "SELECT id, title, price, stock, measurement, measurement_value, cover_img FROM product WHERE featured =  1 AND status =1 ORDER BY RAND() LIMIT 8";
+
+    try{
+        // Get DB Object
+        $db = new db();
+        // Connect
+        $db = $db->connect();
+
+        $stmt = $db->query($sql);
+        $featured = $stmt->fetchAll(PDO::FETCH_OBJ);
+        $db = null;
+        //echo json_encode($customers);
+        return $response->withJson([
+            'message' => "successfully Fetched",
+            'featured' => $featured
+             ]);
+    } catch(PDOException $e){
+        echo '{"error": {"text": '.$e->getMessage().'}';
+    }
+});
+
+
 $app->get('/api/products/featured', function(Request $request, Response $response){
     $sql = "SELECT id, title, price, stock, measurement, measurement_value, cover_img FROM product WHERE featured =  1 AND status =1 ORDER BY RAND() LIMIT 8";
 
